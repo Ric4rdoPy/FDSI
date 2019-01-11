@@ -2,6 +2,7 @@
 # Começando com os imports
 import csv
 import matplotlib.pyplot as plt
+from functools import reduce
 
 # Vamos ler os dados como uma lista
 print("Lendo o documento...")
@@ -24,14 +25,27 @@ print("Linha 1: ")
 print(data_list[1])
 
 input("Aperte Enter para continuar...")
+
+def imprimir_amostras(lista):
+    """
+    Função imprimir_amostras
+          Finalidade: Receber uma lista e gera uma impressão do conteúdo dela.
+
+          Argumentos:
+              lista: Lista a ser impressa
+          Retorna:
+              None.
+    """
+    nr_linha = 0
+    for linha in lista:
+        nr_linha += 1
+        print("linha {0}: {1}".format(nr_linha, linha))
+
 # TAREFA 1
 # TODO: Imprima as primeiras 20 linhas usando um loop para identificar os dados.
 print("\n\nTAREFA 1: Imprimindo as primeiras 20 amostras")
-i = 0
-for linha in data_list[1:21]:
-    i += 1
-    print("linha {0}: {1}".format(i, linha))
-
+#imprimir_amostras(1,21,0)
+imprimir_amostras(data_list[1:21])
 # Vamos mudar o data_list para remover o cabeçalho dele.
 data_list = data_list[1:]
 
@@ -41,13 +55,9 @@ data_list = data_list[1:]
 input("Aperte Enter para continuar...")
 # TAREFA 2
 # TODO: Imprima o `gênero` das primeiras 20 linhas
-
-print("\nTAREFA 2: Imprimindo o gênero das primeiras 20 amostras")
-i = 0
-for linha in data_list[:20]:
-    i += 1
-    print("linha {0}: {1}".format(i, linha[6]))
-
+print("\nTAREFA 2: Imprimindo o gênero das primeiras 20 amostras para gênero")
+nova_lista = list(genero[6] for genero in data_list[:20]) #Expressão geradora
+imprimir_amostras(nova_lista)
 # Ótimo! Nós podemos pegar as linhas(samples) iterando com um for, e as colunas(features) por índices.
 # Mas ainda é difícil pegar uma coluna em uma lista. Exemplo: Lista com todos os gêneros
 
@@ -55,19 +65,19 @@ input("Aperte Enter para continuar...")
 # TAREFA 3
 # TODO: Crie uma função para adicionar as colunas(features) de uma lista em outra lista, na mesma ordem
 # Dica: Você pode usar um for para iterar sobre as amostras, pegar a feature pelo seu índice, e dar append para uma lista
-def column_to_list(data, index):
+def column_to_list(lista, index):
     """
     Função column_to_list
           Finalidade: Receber uma lista e um índice para que seja gerada uma nova lista pelo index referenciado.
 
           Argumentos:
-              Data: Lista com todas as features
+              lista: Lista com todas as features
               index: Índice para ser a referência da nova lista a ser gerada
           Retorna:
               column_list: Lista com a feature referenciada
     """
     column_list = []
-    for perfil in data:
+    for perfil in lista:
         column_list.append(perfil[index])
 
     return column_list
@@ -85,11 +95,31 @@ input("Aperte Enter para continuar...")
 # Agora sabemos como acessar as features, vamos contar quantos Male (Masculinos) e Female (Femininos) o dataset tem
 # TAREFA 4
 # TODO: Conte cada gênero. Você não deveria usar uma função para isso.
-#male = 0
-#female = 0
-genero_lista = column_to_list(data_list, -2)
-male = genero_lista.count("Male")
-female = genero_lista.count("Female")
+male = 0
+female = 0
+def contador_genero(lista):
+    """
+    Função contador_genero
+          Finalidade: Receber uma lista e contabilizar por gênero. Utiliza-se de duas variáveis cujo
+                      escopo é global, então, necessário se faz declará-las, aqui, com a palavra
+                      reservada "global".
+
+          Argumentos:
+              lista: Lista com todas as features
+          Retorna:
+              Uma lista com o total para male, em primeiro e, em segundo, total para female.
+    """
+    global male, female
+    
+    for genero in lista:
+        if genero == "Male":
+            male += 1
+        elif genero == "Female":
+            female += 1
+            
+    return [male, female]
+            
+contador_genero(genero[6] for genero in data_list) #Expressão geradora
 
 # Verificando o resultado
 print("\nTAREFA 4: Imprimindo quantos masculinos e femininos nós encontramos")
@@ -104,27 +134,28 @@ input("Aperte Enter para continuar...")
 # TAREFA 5
 # TODO: Crie uma função para contar os gêneros. Retorne uma lista.
 # Isso deveria retornar uma lista com [count_male, count_female] (exemplo: [10, 15] significa 10 Masculinos, 15 Femininos)
-def count_gender(data_list):
-    """ 
+def count_gender(lista):
+    """
     Função count_gender
-          Finalidade: Receber uma lista e realizar a contagem para cada gênero de pessoa. Para isso,
-                      o método "count" da estrutura de dados lista é utilizado para realizar a contagem
-                      de ocorrências por gênero.
-                      Ao final, uma lista que contém a contagem dos gêneros é retornada,
-                      na seguinte ordem: primeiro o total de ocorrências para o gênero masculino e o
-                      segundo, o total de ocorrências para o gênero feminino.
+          Finalidade: Receber uma lista e contabilizar por gênero. Utiliza-se de duas variáveis (male e female, ambas locais).
 
           Argumentos:
-              data: Lista com todas as features
+              lista: Lista com todas as features
           Retorna:
-              Uma lista com o total por gênero.    
+              Uma lista com o total para male, em primeiro e, em segundo, total para female.
     """
-    genero_lista = column_to_list(data_list, -2) #Índice que referencia o gênero na lista de features
+    male = 0
+    female = 0
+    for genero in lista:
+        if genero[-2] == "Male":
+            male += 1
+        elif genero[-2] == "Female":
+            female += 1
+            
+    return [male, female]
     
-    return [genero_lista.count("Male"), genero_lista.count("Female")]
-
 print("\nTAREFA 5: Imprimindo o resultado de count_gender")
-print(count_gender(data_list))
+print(count_gender(data_list)) #Expressão geradora
 
 # ------------ NÃO MUDE NENHUM CÓDIGO AQUI ------------
 assert type(count_gender(data_list)) is list, "TAREFA 5: Tipo incorreto retornado. Deveria retornar uma lista."
@@ -137,7 +168,7 @@ input("Aperte Enter para continuar...")
 # TAREFA 6
 # TODO: Crie uma função que pegue o gênero mais popular, e retorne este gênero como uma string.
 # Esperamos ver "Male", "Female", ou "Equal" como resposta.
-def most_popular_gender(data_list):
+def most_popular_gender(lista):
     """    
     Função most_popular_gender
           Finalidade: Receber uma lista e realizar a contagem para cada gênero de pessoa. Para isso,
@@ -150,11 +181,11 @@ def most_popular_gender(data_list):
           Argumentos:
               data_list: Lista com todas as features
           Retorna:
-              answer: Atributo que terá o gênero(s) de maior(es) ocorrência(s) .    
+              answer: Atributo que terá o gênero de maior ocorrência .    
     """
     answer = "Equal"
     
-    lista_male_female = count_gender(data_list)
+    lista_male_female = count_gender(lista)
     if lista_male_female [0] < lista_male_female [1]:
         answer = "Female"
     elif lista_male_female [0] > lista_male_female [1]:
@@ -186,25 +217,37 @@ input("Aperte Enter para continuar...")
 # TAREFA 7
 # TODO: Crie um gráfico similar para user_types. Tenha certeza que a legenda está correta.
 
-def count_user_type(data_list, user_type_list):
+def count_user_type(lista, user_type_list):
     """    
     Função count_user_type
-          Finalidade: Receber uma lista com várias features e separar a feature "gender" para
-                      contabilizar as ocorrências para cada "user_type". Ao final, retornar uma
-                      lista que irá conter o total de ocorrência para cada "user_type"
+          Finalidade: Receber uma lista com várias features e separar a feature "user_type_list" para
+                      contabilizar as ocorrências para cada "user_type". Faz-se uma seleção por
+                      user_type para realizar a contagem por esse atributo. Ao final, retornar uma
+                      lista que irá conter o total de ocorrência para cada "user_type".
 
           Argumentos:
-              data_list: Lista com todas as features
+              lista: Lista com todas as features
               user_type_list: Lista com os tipos existentes de data_list para que se possa
                               realizar a contagem por esses tipos.
           Retorna:
               answer: Uma lista com os totais por user_type .    
     """
 
-    user_lista = column_to_list(data_list, -3)
+    user_lista = column_to_list(lista, -3)
     
-    return [user_lista.count(user_type_list[0]), user_lista.count(user_type_list[1]),
-            user_lista.count(user_type_list[2])]
+    contador0 = 0
+    contador1 = 0
+    contador2 = 0
+    
+    for user_type in user_lista:
+        if user_type == user_type_list[0]:
+            contador0 += 1
+        elif user_type == user_type_list[1]:
+            contador1 += 1
+        elif user_type == user_type_list[2]:
+            contador2 += 1
+    
+    return [contador0, contador1, contador2]
         
 user_type_lista = list(set(column_to_list(data_list, -3)))
 print("\nTAREFA 7: Verifique o gráfico!")
@@ -242,7 +285,7 @@ input("Aperte Enter para continuar...")
 # TODO: Ache a duração de viagem Mínima, Máxima, Média, e Mediana.
 # Você não deve usar funções prontas para isso, como max() e min().
 
-def monta_lista(data, index):
+def monta_lista(lista, index):
     """    
     Função monta_lista
           Finalidade: Receber uma lista e separar a feature por, também, um índice recebido.
@@ -250,26 +293,51 @@ def monta_lista(data, index):
                       suas respectivas ocorrências.
 
           Argumentos:
-              data: Lista com todas as features
+              lista: Lista com todas as features
               index: Índice que referencia a feature a ser extraída de data.
           Retorna:
-              lista: Uma lista com o tempo expresso em tipo inteiro utilizado pelo usuário no trajeto inicial e final com
+              nova_lista: Uma lista com o tempo expresso em tipo inteiro utilizado pelo usuário no trajeto inicial e final com
               o uso da bicicleta locada.
     """
     
-    lista = []
-    for tempo in data:
+    nova_lista = []
+    for tempo in lista:
         if tempo[index]!="":
-            lista.append(int(tempo[index]))
+            nova_lista.append(int(tempo[index]))
 
-    return lista
+    return nova_lista
+
+def somar_viagem(lista):
+    """    
+    Função somar_viagem
+          Finalidade: Receber uma lista e realiza a soma de seus elementos e retorna o valor desse somatório.
+          
+          Argumentos:
+              lista: Lista com todas a feature tempo de viagem
+          Retorna:
+              soma: O somatório do tempo de viagem.
+    """    
+    soma = 0
+    for viagem in lista:
+        soma += viagem
+        
+    return soma
 
 trip_duration_list = monta_lista(data_list, 2)
 trip_duration_list.sort()
 min_trip = trip_duration_list[0]
 max_trip = trip_duration_list.pop()
-mean_trip = sum(trip_duration_list)/len(trip_duration_list)
-
+mean_trip = somar_viagem(trip_duration_list)/len(trip_duration_list)
+"""
+mean_trip = reduce(lambda x,y: x+y, trip_duration_list)/len(trip_duration_list)
+-------------------------------------------------------------------------------
+                                      ^
+                                      |
+                                      |
+Essa técnica com uma função anônima(lambda) funcion
+ou bem, mas segundo o meu revisor, devo utilizar 
+uma função de usuário (somar_viagem) para realizar o somatório total do tempo de percurso.
+"""
 if (len(trip_duration_list)%2) != 0:
     median_trip = trip_duration_list[round(len(trip_duration_list)/2)]
 else:
