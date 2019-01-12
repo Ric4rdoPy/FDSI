@@ -1,8 +1,10 @@
 # coding: utf-8
 # Começando com os imports
+# Projeto 1 - Curso FDSI
+# Autor: Ricardo Albuquerque - Brasília-DF
 import csv
 import matplotlib.pyplot as plt
-from functools import reduce
+#from functools import reduce
 
 # Vamos ler os dados como uma lista
 print("Lendo o documento...")
